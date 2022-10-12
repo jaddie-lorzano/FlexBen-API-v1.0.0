@@ -1,6 +1,7 @@
 # Files
 *.log
 *.env
+config/config.json
 
 # Folders
 log/*
