@@ -1,0 +1,35 @@
+{
+  "name": "flexben-api",
+  "version": "1.0.0",
+  "description": "FlexBen or Flexible Benefits allow employees to choose the benefits they want or need from a package of programs offered by an employer. The goal of this project is to develop a tool that will efficiently and effectively manage the flexible benefit programs according to the processes of the organization.",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "flexben",
+    "employer",
+    "employee",
+    "benefits",
+    "program",
+    "tool",
+    "organize",
+    "manage",
+    "flexible"
+  ],
+  "author": "Jaddie Lorzano",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^8.5.1",
+    "mysql2": "^2.3.3",
+    "sequelize": "^6.25.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
