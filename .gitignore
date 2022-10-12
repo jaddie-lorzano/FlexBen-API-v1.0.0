@@ -4,5 +4,5 @@
 config/config.json
 
 # Folders
-log/*
+logs/*
 node_modules
