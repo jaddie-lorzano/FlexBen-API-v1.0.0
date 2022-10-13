@@ -1,5 +1,7 @@
-import checkResults from "./checkResults"
+import checkResults from "./checkResults.js"
+import FlexPointCalculator from "./FlexPointCalculator.js"
 
-export default {
-    checkResults
+export {
+    checkResults,
+    FlexPointCalculator
 }

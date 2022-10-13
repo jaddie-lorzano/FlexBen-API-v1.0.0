@@ -1,4 +1,4 @@
-export const checkResult = () =>{
+const checkResult = () =>{
     class Result {
         constructor(isSuccess, error, value) {
             if (isSuccess && error) {
@@ -37,3 +37,4 @@ export const checkResult = () =>{
     return Result;
 }
 
+export default checkResult;

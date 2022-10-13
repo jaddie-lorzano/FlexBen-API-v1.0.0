@@ -1,10 +1,10 @@
 import { Router } from "express";
-import AdminRoute from "./admin.route";
-import EmployeeRoute from "./employee.route";
+import AdminRoute from "./admin.route.js";
+import EmployeeRoute from "./employee.route.js";
 
 const AppRoute = Router();
 
-AppRoute.route('/', EmployeeRoute);
-AppRoute.route('/admin/', AdminRoute);
+AppRoute.use('/admin/', AdminRoute);
+AppRoute.use('/', EmployeeRoute);
 
 export default AppRoute;

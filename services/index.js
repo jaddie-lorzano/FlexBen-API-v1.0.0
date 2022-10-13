@@ -1,9 +1,9 @@
-import AdminService from "./admin.service";
-import AuthenticationService from "./authentication.service";
-import EmployeeService from "./employee.service";
-import ReimbursementService from "./reimbursement.service";
+import AdminService from "./admin.service.js";
+import AuthenticationService from "./authentication.service.js";
+import EmployeeService from "./employee.service.js";
+import ReimbursementService from "./reimbursement.service.js";
 
-export default {
+export {
     AdminService,
     AuthenticationService,
     EmployeeService,

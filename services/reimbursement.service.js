@@ -1,7 +1,4 @@
 
-import FlexReimbursement from "../models/flexReimbursement";
-import FlexReimbursementDetail from "../models/flexReimbursementDetail";
-
 export default class ReimbursementService {
     constructor({
         flexReimbursementListModel = FlexReimbursement, // inject reimbursement list model

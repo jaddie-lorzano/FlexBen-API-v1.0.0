@@ -1,4 +1,4 @@
-import { ReimbursementService } from "../services";
+import { ReimbursementService } from "./index.js";
 export default class EmployeeService {
     constructor({
         reimbursementService = ReimbursementService, // injects the reimbursement service
