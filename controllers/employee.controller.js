@@ -1,13 +1,17 @@
-import { EmployeeRepository } from '../repositories/index.js';
-import { EmployeeService } from '../services/index.js';
-import { FlexPointCalculator } from '../utils/index.js';
+import { EmployeeRepository } from '../repositories/index.js'
+import { EmployeeService } from '../services/index.js'
+import { FlexPointCalculator } from '../utils/index.js'
+import { EmployeeDTO } from '../data.transfer.object/index.js'
 
 let employeeRepository = new EmployeeRepository()
 
 const EmployeeController = {
     // US0001: The application should be able to retrieve the user information
     retrieveEmployeeDetails : async (req, res, next) => {
-        await employeeRepository.getById(4)
+        let entity = new EmployeeDTO({
+            
+        })
+        await employeeRepository.insert(entity)
             .then(entities => {
                 let employees = entities
                 res.json({

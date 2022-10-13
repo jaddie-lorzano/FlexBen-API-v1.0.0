@@ -13,6 +13,7 @@ export default class BaseRepository {
         this.tablePrimaryKeyColumn = tablePrimaryKeyColumn;
         this.columnList = tableColumnList;
         this.valuesList = [];
+        this.placeholders = [];
         this.entities = [];
     }
     async getAll () {
@@ -47,12 +48,15 @@ export default class BaseRepository {
     async insert (entity) {
         Object.values(entity)
             .forEach(value => {
-                this.valuesList.push(value)
+                this.valuesList.push(value);
+                this.placeholders.push('?')
             })
+        let placeholdersString = this.placeholders.join(',')
         let dbValuesList = this.valuesList
         let sql = ` INSERT INTO ${this._dbName}.${this.dbTable} 
                     (${this.columnList}) 
-                    VALUES (?,?,?)`;
+                    VALUES (${placeholdersString})`;
+        console.log(`${sql}, ${dbValuesList}`);
         let newEntityId = await db.execute(sql, dbValuesList)
             .then(data => { 
                 let [result, _] = data; return result.insertId
