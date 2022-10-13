@@ -8,7 +8,8 @@ export default class CategoryRepository extends BaseRepository {
         super({
             db: db,
             dbName: process.env.DB_NAME,
-            table: DB_TABLE.CATEGORIES
+            table: DB_TABLE.CATEGORIES.TABLE_NAME,
+            tablePrimaryKeyColumn: DB_TABLE.CATEGORIES.CATEGORY_ID
         })
     }
 }

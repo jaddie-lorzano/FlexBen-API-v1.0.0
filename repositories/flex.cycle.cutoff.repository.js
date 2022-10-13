@@ -8,7 +8,8 @@ export default class FlexCycleCutOffRepository extends BaseRepository {
         super({
             db: db,
             dbName: process.env.DB_NAME,
-            table: DB_TABLE.FLEX_CYCLE_CUT_OFFS
+            table: DB_TABLE.FLEX_CYCLE_CUT_OFFS.TABLE_NAME,
+            tablePrimaryKeyColumn: DB_TABLE.FLEX_CYCLE_CUT_OFFS.FLEX_CYCLE_CUT_OFF_ID
         })
     }
 }

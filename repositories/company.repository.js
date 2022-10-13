@@ -8,7 +8,8 @@ export default class CompanyRepository extends BaseRepository {
         super({
             db: db,
             dbName: process.env.DB_NAME,
-            table: DB_TABLE.COMPANIES
+            table: DB_TABLE.COMPANIES.TABLE_NAME,
+            tablePrimaryKeyColumn: DB_TABLE.COMPANIES.COMPANY_ID
         })
     }
 }

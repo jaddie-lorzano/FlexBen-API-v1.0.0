@@ -8,7 +8,8 @@ export default class FlexReimbursementDetailRepository extends BaseRepository {
         super({
             db: db,
             dbName: process.env.DB_NAME,
-            table: DB_TABLE.FLEX_REIMBURSEMENT_DETAILS
+            table: DB_TABLE.FLEX_REIMBURSEMENT_DETAILS.TABLE_NAME,
+            tablePrimaryKeyColumn: DB_TABLE.FLEX_REIMBURSEMENT_DETAILS.FLEX_REIMBURSEMENT_DETAIL_ID
         })
     }
 }

@@ -8,7 +8,8 @@ export default class AccountRepository extends BaseRepository {
         super({
             db: db,
             dbName: process.env.DB_NAME,
-            table: DB_TABLE.ACCOUNTS
+            table: DB_TABLE.ACCOUNTS.TABLE_NAME,
+            tablePrimaryKeyColumn: DB_TABLE.ACCOUNTS.ACCOUNT_ID
         })
     }
 }
