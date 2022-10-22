@@ -77,6 +77,7 @@ const DB_TABLE = {
         IS_ACTIVE: 'is_active',
         CUT_OFF_CAP_AMOUNT: 'cut_off_cap_amount',
         CUT_OFF_DESCRIPTION: 'cut_off_description',
-    }
+    },
+    SOFT_DELETE_COLUMN : 'is_active',
 }
 export default DB_TABLE

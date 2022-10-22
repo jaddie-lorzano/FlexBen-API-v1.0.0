@@ -1,71 +1,91 @@
-
 export default class ReimbursementService {
     constructor({
-        flexReimbursementListModel = FlexReimbursement, // inject reimbursement list model
-        flexReimbursementItemModel = FlexReimbursementDetail, // injects reimbursement item model
+        flexReimbursementRepository,
+        flexReimbursementDetailRepository,
+        categoryRepository,
     }) {
-        this._flexReimbursementItemModel = flexReimbursementItemModel,
-        this._flexReimbursementListModel = flexReimbursementListModel,
-        this.reimbursementList,
-        this.reimbursementItem
+        this.flexReimbursementRepository = flexReimbursementRepository;
+        this.flexReimbursementDetailRepository = flexReimbursementDetailRepository;
+        this.categoryRepository = categoryRepository;
+    }
+    async checkReimbursementListId(id) {
+        let isExisting = false
+        this.flexReimbursementRepository.getById(id)
+            .then(reimbursement => {
+                if (reimbursement) { isExisting = true; }
+            })
+    }
+    async createNewReimbursementList({
+        employee_id,
+        flex_cut_off_id
+    }) {
+        let newReimbursementList = {
+            employee_id,
+            flex_cut_off_id,
+            total_reimbursement_amount: 0,
+            date_submitted: null,
+            status: 'Draft',
+            date_updated: new Date(),
+            transaction_number: null,
+        }
+        let entityId;
+        await this.flexReimbursementRepository
+            .insert(newReimbursementList)
+            .then(id => {
+                entityId = id
+            })
+            .catch(err => {throw err});
+        return entityId
+    }
+    async createNewReimbursementItem({
+        flex_reimbursement_id,
+        category_id,
+        or_number,
+        name_of_establishment,
+        tin_of_establishment,
+        amount,
+        date_added
+    }) {
+        let newReimbursementItem = {
+            flex_reimbursement_id,
+            category_id,
+            or_number,
+            name_of_establishment,
+            tin_of_establishment,
+            amount,
+            status : 'Draft',
+            date_added
+        }
+    }
+    async getCategoryId (category_name) {
+        let categoryId
+        await this.categoryRepository.getCategoryId(category_name)
+            .then(result => {
+                categoryId = result
+            })
+            .catch(err => {throw err})
+        return categoryId        
+    }
+    async validateReimbursementDate ({
+        day,
+        month,
+        year
+    }) {
+        let dateAdded = new Date(year, month, day)
+        let currentDate = new Date();
+        let currentYear = currentDate.getFullYear()
+        let currentMonth = currentDate.getMonth()
+        let currentDay = currentDate.getDate()
+        if (year != currentYear) {
+            throw new Error(`Reimbursement date should fall within year '${currentYear}'`)
+        }
+        if (month > currentMonth) {
+            throw new Error(`Reimbursement date should not be beyond the current month`)
+        }
+        if (day > currentDay && month == currentMonth) {
+            throw new Error(`Reimbursement date should not be past the current date`)
+        }
+        return true;
     }
 
-    createReimbursementItem(reimbursementListId, newReimbursementItemDetail) {
-        // return reimbursement item\
-        this.reimbursementItem = new this._flexReimbursementItemModel(newReimbursementItemDetail)
-        this.reimbursementList = this.reimbursementRepository
-            .getReimbursementListById(reimbursementListId)
-        this.reimbursementItem = 
-            new this._flexReimbursementItemBuilder(newReimbursementDetail);
-        this.reimbursementItem
-            .checkReimbursmentCutOffStatus()
-            .validateReimbursementDate()
-            .checkReimbursementItemAmountLimit()
-            .addReimbursementItemToList()
-            .computeTotalReimbursableAmount()
-        return this;
-    }
-    
-    // Employee should be able to remove an item from the reimbursemement list
-    deleteReimbursementItem(reimbursementId) {
-        this.reimbursementRepository.deleteReimbursementItem(reimbursementId)
-    }
-
-    checkReimbursmentCutOffStatus() {
-        // return true/false
-    }
-
-    validateReimbursementDate() {
-        // check if date is <= current date && year == current year
-    }
-
-    checkReimbursementItemAmountLimit() {
-        // check if amount >= minimum amount | 500 PhP
-    }
-    
-    // Reimbursement item should be added to the reimbursement list
-    addReimbursementItemToList() {
-        // return message
-    }
-
-    // Total reimburseable amount should be returned
-    computeTotalReimbursableAmount() {
-        // return total reimbursement amount
-    }
-
-    // The system should be able to detect if the reimbursement amount is greater than the maximum reimburseable amount for the given cut-off.
-    checkReimbursementAmountLimit() {
-        // return true/false
-    }
-
-    // Initial status of the reimbursement and reimbursement items/details should be "Draft"
-    setReimbursementStatus() {
-
-    }
-
-    updateTotalReimbursableAmount() {
-
-    }
-    // Upon successful removal of an item, update the total reimburseable amount
-    // Only items with status "Draft" should be removable from the reimbursement list.
 }

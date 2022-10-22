@@ -1,29 +1,111 @@
-import { EmployeeRepository } from '../repositories/index.js'
-import { EmployeeService } from '../services/index.js'
+import { request } from 'express';
+import { FlexReimbursementRepository, FlexReimbursementDetailRepository, CategoryRepository } from '../repositories/index.js'
+import { ReimbursementService } from '../services/index.js'
 import { FlexPointCalculator } from '../utils/index.js'
-import { EmployeeDTO } from '../data.transfer.object/index.js'
 
-let employeeRepository = new EmployeeRepository()
+let categoryRepository = new CategoryRepository();
+let flexReimbursementRepository = new FlexReimbursementRepository();
+let flexReimbursementDetailRepository = new FlexReimbursementDetailRepository();
+let reimbursementService = new ReimbursementService({
+    flexReimbursementRepository,
+    flexReimbursementDetailRepository,
+    categoryRepository
+});
 
 const EmployeeController = {
-    // US0001: The application should be able to retrieve the user information
-    retrieveEmployeeDetails : async (req, res, next) => {
-        let entity = new EmployeeDTO({
-            
-        })
-        await employeeRepository.insert(entity)
-            .then(entities => {
-                let employees = entities
-                res.json({
-                    employees: employees
-                })
+    createReimbursementList : async (req, res, next) => {
+        console.log('ENTER: createReimbursementList')
+        let flexCutOffId = req.body.flexCutOffId;
+        let user = req.user;
+        let newReimbursementListId;
+        let error;
+        await reimbursementService
+            .createNewReimbursementList({
+                employee_id: user.employee_id,
+                flex_cut_off_id: flexCutOffId
             })
-            .catch(err => {next(err);});
-        // call user service to retrieve the user information
+            .then(entityId => {
+                newReimbursementListId = entityId
+            })
+            .catch(err => error = err)
+        if (error) {
+            next(error);
+        }
+        if (newReimbursementListId) {
+            console.log(`USER: ${JSON.stringify(newReimbursementListId)}`)
+            res.status(201).json({
+                status: 201,
+                statusText: 'Created',
+                message: `Reimbursement Item ${newReimbursementListId} successfully created`,
+                data: { newReimbursementListId }
+            })
+        }
     },
-    // US0004: As an employee, I can add a reimbursement item
-    addReimbursementItem : async (req, res, next) =>{
-        res.send(`call employee service to add reimbursement detail item of ID ${req.params.reimbursementId}`)
+    validateReimbursementListId : async (req, res, next) => {
+        let reimbursementListId = req.params.reimbursementId;
+        let isExistingReimbursementListId = false;
+        let errorList = req.errorList
+        let isValid = {
+            reimbursementListId: null,
+        }
+        await reimbursementService.checkReimbursementListId(reimbursementListId)
+            .then(isExisting => {
+                if (isExisting) isExistingReimbursementListId = isExisting;
+                let validationErrorMessage = `Reimbursement list id ${reimbursementListId} does not exist`;
+                errorList.push(validationErrorMessage);
+            })
+            .catch(err => errorList.push(err))
+        req.errorList = errorList
+    },
+    validateReimbursementDate : async (req, res, next) => {
+        let { dateAdded } = req.body
+        await reimbursementService
+            .validateReimbursementDate(dateAdded)
+            .then()
+            .catch((err) => { error = err; })
+    },
+    validateCategory : async (req, res, next) => {
+        let { category } = req.body
+        let categoryId
+        await reimbursementService.getCategoryId(category)
+            .then((id) => {
+                categoryId = id;
+            })
+            .catch((err) => {
+                throw err
+            });
+        if (categoryId) {
+            req.body.categoryId = categoryId;
+            next()
+        }
+    },
+    validateReimbursementAmount : async (req, res, next) => {
+        let { amount } = req.body
+        if (amount < 500) {
+            return res.status(400).json({
+                status: 400,
+                statusText: 'Bad Request',
+                message: 'Amount must be greater than or equal to 500',
+                error: {
+                    code: 'BAD_REQUEST',
+                    message: 'Amount must be greater than or equal to 500',
+                }
+            })
+        }
+    },
+    addReimbursementItem : async (req, res, next) => {
+        let { dateAdded, orNumber, nameOfEstablishment, tinOfEstablishment, amount, category } = req.body;
+        await reimbursementService
+            .createNewReimbursementItem({
+                flex_reimbursement_id: reimbursementId,
+                category_id: categoryId,
+                or_number: orNumber,
+                name_of_establishment: nameOfEstablishment,
+                tin_of_establishment: tinOfEstablishment,
+                amount,
+                date_added: dateAdded
+            })
+        res.send(`add reimbursement item`)
         // call employee service to add reimbursement detail item
     },
     // US0005: As an employee, I can remove a reimbursement item from the list

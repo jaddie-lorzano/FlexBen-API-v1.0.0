@@ -3,10 +3,20 @@ import { EmployeeController, UserController } from "../controllers/index.js"
 
 const EmployeeRoute = Router();
 
+EmployeeRoute
+    .route('/reimbursements/create')
+    .post(EmployeeController.createReimbursementList)
+    .all((req, res, next) => res.send("Bad request"))
 
 EmployeeRoute
     .route('/reimbursements/:reimbursementId(\\d+)/addItem')
-    .post(EmployeeController.addReimbursementItem)
+    .post(
+        EmployeeController.validateReimbursementListId,
+        EmployeeController.validateReimbursementDate,
+        EmployeeController.validateCategory,
+        EmployeeController.validateReimbursementAmount,
+        EmployeeController.addReimbursementItem
+    )
     .all((req, res, next) => res.send("Bad request"))
     // * POST /reimbursements/:reimbursementId/addItem
     // US0004: As an employee, I can add a reimbursement item
@@ -36,24 +46,18 @@ EmployeeRoute
     .route('/reimbursements/calculateFlexPoints')
     .get(EmployeeController.calculateFlexPoints)
     .all((req, res, next) => res.send("Bad request"))
-    // * GET /reimbursements/:reimbursementId/calaculateFlexPoints?numOfFlexCredit&monthlyRate
+    // * GET /reimbursements/calaculateFlexPoints?numOfFlexCredit&monthlyRate
     // US008: As an employee, I can calculate my flex points
 
 EmployeeRoute.use('/reimbursements/:reimbursementId(\\d+)/', (req, res, next) => {
     res.send(JSON.stringify(req.params))
 })
 
-EmployeeRoute.use('/info', (req, res, next) => {
-    res.send('get employee user information')
-    // * GET /info
-    // US0001: The application should be able to retrieve the user information
-})
-
-EmployeeRoute.use('/login', UserController.login)
-
-EmployeeRoute.use('/logout', UserController.logout)
+EmployeeRoute.use('/info',UserController.retrieveEmployeeDetails)
+// * GET /info
+// US0001: The application should be able to retrieve the user information
     
-EmployeeRoute.use('/', EmployeeController.retrieveEmployeeDetails)
+EmployeeRoute.use('/', UserController.retrieveEmployeeDetails)
 
 export default EmployeeRoute
     

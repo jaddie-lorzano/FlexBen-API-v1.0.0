@@ -7,6 +7,7 @@ import FlexReimbursementRepository from './flex.reimbursement.repository.js'
 import FlexReimbursementDetailRepository from './flex.reimbursement.detail.repository.js'
 import FlexCycleCutOffRepository from './flex.cycle.cutoff.repository.js'
 import CategoryRepository from './category.repository.js'
+import LogRepository from './log.repository.js'
 
 export {
     BaseRepository,
@@ -17,5 +18,6 @@ export {
     FlexReimbursementRepository,
     FlexReimbursementDetailRepository,
     FlexCycleCutOffRepository,
-    CategoryRepository
+    CategoryRepository,
+    LogRepository
 }

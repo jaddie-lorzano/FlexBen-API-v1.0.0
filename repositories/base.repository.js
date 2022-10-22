@@ -1,19 +1,18 @@
 
+import { DB_TABLE } from '../constants/index.js';
 export default class BaseRepository {
     constructor({
         db,
         dbName,
         table,
-        tablePrimaryKeyColumn,
-        tableColumnList
+        tablePrimaryKeyColumn
     }) {
         this._db = db;
         this._dbName = dbName
         this.dbTable = table;
         this.tablePrimaryKeyColumn = tablePrimaryKeyColumn;
-        this.columnList = tableColumnList;
+        this.columnList = [];
         this.valuesList = [];
-        this.placeholders = [];
         this.entities = [];
     }
     async getAll () {
@@ -22,7 +21,6 @@ export default class BaseRepository {
         this.entities = await this._db.execute(sql)
             .then(data => {
                 let [result, _] = data;
-                console.log(JSON.stringify(result));
                 return result
             })
             .catch(err => { 
@@ -34,7 +32,6 @@ export default class BaseRepository {
         let sql = ` SELECT * 
                     FROM ${this._dbName}.${this.dbTable} 
                     WHERE ${this.tablePrimaryKeyColumn} = ?`
-        console.log(`${sql}, [${id}]`)
         this.entity = await this._db.execute(sql, [id])
             .then(data => {
                 let [result, _] = data
@@ -46,24 +43,111 @@ export default class BaseRepository {
         return this.entity;
     }
     async insert (entity) {
+        let placeholders = [];
+        let valuesList = [];
+        let columnList = [];
         Object.values(entity)
             .forEach(value => {
-                this.valuesList.push(value);
-                this.placeholders.push('?')
+                if (value === undefined) { value = null }
+                valuesList.push(value);
+                placeholders.push('?')
             })
-        let placeholdersString = this.placeholders.join(',')
-        let dbValuesList = this.valuesList
+        Object.keys(entity)
+            .forEach(key => {
+                columnList.push(key);
+            })
+        let placeholdersString = placeholders.join(',')
+        valuesList
+
         let sql = ` INSERT INTO ${this._dbName}.${this.dbTable} 
-                    (${this.columnList}) 
+                    (${columnList}) 
                     VALUES (${placeholdersString})`;
-        console.log(`${sql}, ${dbValuesList}`);
-        let newEntityId = await db.execute(sql, dbValuesList)
+
+        let newEntityId = await this._db.execute(sql, valuesList)
             .then(data => { 
                 let [result, _] = data; return result.insertId
             })
             .catch(err => {
-                return err
+                throw err;
             });
         return newEntityId;
     }
+
+    async deleteById(id) {
+        let sql = ` DELETE FROM ${this._dbName}.${this.dbTable} 
+                    WHERE ${this.tablePrimaryKeyColumn} = ?`
+        this.entity = await this._db.execute(sql, [id])
+            .then(data => {
+                let [result, _] = data
+                return result
+            })
+            .catch(err => {
+                return err
+            })
+        return this.entity;
+    }
+    async softDeleteById(id) {
+        let sql = ` UPDATE ${this._dbName}.${this.dbTable}
+                    SET ${DB_TABLE.SOFT_DELETE_COLUMN} = 0
+                    WHERE ${this.tablePrimaryKeyColumn} = ?`
+        this.entity = await this._db.execute(sql, [id])
+            .then(data => {
+                let [result, _] = data
+                return result
+            })
+            .catch(err => {
+                return err
+            })
+        return this.entity;
+    }
+
+    async updateById(id, {columns = [], values = []}) {
+        let updates = [];
+        let placeholders = [];
+        columns.forEach(column => {
+            updates.push(`${column} = ?`);
+            placeholders.push('?');
+        })
+        let updateColumnString = updates.join(', ');
+        let sql = ` UPDATE ${this._dbName}.${this.dbTable}
+                    SET ${updateColumnString}
+                    WHERE ${this.tablePrimaryKeyColumn} = ?`
+        this.entity = await this._db.execute(sql, [...values, id])
+            .then(data => {
+                let [result, _] = data
+                return result
+            })
+            .catch(err => {
+                return err
+            })
+        return this.entity;
+    }
+    async search({columns = [], values = []}) {
+        
+        let searches = [];
+        let placeholders = [];
+        let searchValues = [];
+        columns.forEach(column => {
+            searches.push(`${column} LIKE ?`);
+            placeholders.push('?');
+        })
+
+        values.forEach(value => {
+            searchValues.push(`${value}%`);
+        })
+        // column LIKE 'value%'
+        let searchColumnString = searches.join(' AND ');
+        let sql = ` SELECT * 
+                    FROM ${this._dbName}.${this.dbTable}
+                    WHERE ${searchColumnString}`
+        this.entity = await this._db.execute(sql, [...searchValues, id])
+            .then(data => {
+                let [result, _] = data
+                return result
+            })
+            .catch(err => {
+                return err
+            })
+        return this.entity;
+     }
 }
